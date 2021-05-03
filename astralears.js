@@ -233,13 +233,14 @@ function forceStop(gid, stoppingUser) {
         embed.setColor(config.color);
         embed.setDescription("That's all folks! Thanks for using "+ config.name+"!");
     
+        currentMemory[gid].mediaPlayerMessage.edit("", embed);
         currentMemory[gid].textChannel.send(embed);
         currentMemory[gid].mediaPlayerMessage.unpin();
+		currentMemory[gid].mediaPlayerMessage.reactions.removeAll();
         currentMemory[gid].channel = null;
-        currentMemory[gid].queue = [];
-        currentMemory[gid].skipRequesters = [];
         currentMemory[gid].paused = false;
         currentMemory[gid].repeat = false;
+        currentMemory[gid].skipRequesters = [];
         currentMemory[gid].voiceConnection.disconnect();
     }
 }
@@ -422,7 +423,7 @@ client.on('message', function(message) {
             } else {
                 printQueue(gid);
             }
-        } else if (command == "time") {
+        } else if (command == "time" || command == "np") {
             if (currentMemory[gid].channel == null) {
                 message.reply("To see the time elapsed, you'll need to enqueue an item.");
             } else {
@@ -466,6 +467,14 @@ client.on('message', function(message) {
             embed.addField("Enqueue an item", "To enqueue an item, simply place the search query or URL after the prefix. For example,\n" + config.prefix + "https://www.youtube.com/watch?v=dQw4w9WgXcQ\n" + config.prefix + "DiscoVision");
             embed.addField("Using the player", "When music is playing, a pinned message will indicate the current status of the player. Reactions to that message can be used to control the player.");
             message.channel.send(embed);
+        } else if (command == "about") {
+                let embed = new Discord.MessageEmbed();
+                embed.setTitle(`About ${config.name}`);
+                embed.setDescription("This is a Music Bot originally developed by vicr123, but now revived and maintained by JPlexer.");
+                embed.setColor(config.color);
+                embed.addField("License", "This Bot is licenced under the GPL v3 License.");
+                embed.addField("Github", "The Source Code of the Bot is available at https://github.com/JPlexer/AstralEars");
+                message.channel.send(embed);
         } else {
             if(command.startsWith("play ")) {command = command.substr(5)}
             else if(command.startsWith("p ")) {command = command.substr(2)}
