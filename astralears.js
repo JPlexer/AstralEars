@@ -98,7 +98,7 @@ function playNextSong(gid, manualSkip, skippingUser) {
         } else {
             currentMemory[gid].skipRequesters.push(skippingUser.id)
             if (connection.channel.members.filter(member => !member.user.bot).size / 2 > currentMemory[gid].skipRequesters.length) {
-                currentMemory[gid].textChannel.send(`<:aewarning:3838515499611586561> Counted Vote! You need ${Math.ceil((connection.channel.members.filter(member => !member.user.bot).size / 2) - currentMemory[gid].skipRequesters.length)} more person to skip.`);
+                currentMemory[gid].textChannel.send(`<:aewarning:838515499611586561> Counted Vote! You need ${Math.ceil((connection.channel.members.filter(member => !member.user.bot).size / 2) - currentMemory[gid].skipRequesters.length)} more person to skip.`);
                 return;
             } else {
                 currentMemory[gid].skipRequesters = [];
@@ -132,7 +132,7 @@ function playNextSong(gid, manualSkip, skippingUser) {
                 });
 
                 dispatcher = connection.play(stream, {
-                    volume: 0.7
+                    volume: 0.5
                 });
             } else if (video.method == "ffmpeg") {
                 dispatcher = connection.play(video.url);
