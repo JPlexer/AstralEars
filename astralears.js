@@ -93,13 +93,24 @@ function playNextSong(gid, manualSkip, skippingUser) {
         } else {
        if (connection.channel.members.filter(member => !member.user.bot).size / 2 > currentMemory[gid].skipRequesters.length) {
            if(currentMemory[gid].skipRequesters.includes(skippingUser.id)) {
-            currentMemory[gid].textChannel.send(`<:aewarning:838515499611586561> You already voted to skip. You need ${Math.ceil((connection.channel.members.filter(member => !member.user.bot).size / 2) - currentMemory[gid].skipRequesters.length)} more person to skip.`);
-            return;
+               if(Math.ceil((connection.channel.members.filter(member => !member.user.bot).size / 2) - currentMemory[gid].skipRequesters.length) === 1) {
+                currentMemory[gid].textChannel.send(`<:aewarning:838515499611586561> You already voted to skip. You need ${Math.ceil((connection.channel.members.filter(member => !member.user.bot).size / 2) - currentMemory[gid].skipRequesters.length)} more person to skip.`);
+                return;
+               } else {
+                currentMemory[gid].textChannel.send(`<:aewarning:838515499611586561> You already voted to skip. You need ${Math.ceil((connection.channel.members.filter(member => !member.user.bot).size / 2) - currentMemory[gid].skipRequesters.length)} more people to skip.`);
+                return;
+               }
+               
         } else {
             currentMemory[gid].skipRequesters.push(skippingUser.id)
             if (connection.channel.members.filter(member => !member.user.bot).size / 2 > currentMemory[gid].skipRequesters.length) {
-                currentMemory[gid].textChannel.send(`<:aewarning:838515499611586561> Counted Vote! You need ${Math.ceil((connection.channel.members.filter(member => !member.user.bot).size / 2) - currentMemory[gid].skipRequesters.length)} more person to skip.`);
-                return;
+                if(Math.ceil((connection.channel.members.filter(member => !member.user.bot).size / 2) - currentMemory[gid].skipRequesters.length) === 1) {
+                    currentMemory[gid].textChannel.send(`<:aewarning:838515499611586561> You already voted to skip. You need ${Math.ceil((connection.channel.members.filter(member => !member.user.bot).size / 2) - currentMemory[gid].skipRequesters.length)} more person to skip.`);
+                    return;
+                   } else {
+                    currentMemory[gid].textChannel.send(`<:aewarning:838515499611586561> You already voted to skip. You need ${Math.ceil((connection.channel.members.filter(member => !member.user.bot).size / 2) - currentMemory[gid].skipRequesters.length)} more people to skip.`);
+                    return;
+                   }
             } else {
                 currentMemory[gid].skipRequesters = [];
             }
