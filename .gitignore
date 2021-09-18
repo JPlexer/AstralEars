@@ -1,5 +1,9 @@
-keys.js
+config.json
 /node_modules
 todo.txt
 config.blueprint.js
 package-lock.json
+/testfiles
+/lavalink/Lavalink.jar
+/lavalink/logs
+/lavalink/application.yml
