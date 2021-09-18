@@ -1,7 +1,7 @@
 const {
 	SlashCommandBuilder
 } = require('@discordjs/builders');
-const { MessageEmbed } = require('discord.js');
+const { MessageEmbed,  MessageActionRow, MessageButton } = require('discord.js');
 const { configcolor, configname, configversion} = require('../config.json');
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -41,7 +41,30 @@ module.exports = {
 			embed.setTitle(configname);
 			embed.setColor(configcolor);
 			embed.setDescription("Welcome to "+ configname +"! Initializing media player...");
-			var message = interaction.channel.send({ embeds: [embed] });
+			const row = new MessageActionRow()
+			.addComponents(
+				new MessageButton()
+					.setCustomId('queue')
+					.setLabel('Queue')
+					.setStyle('SUCCESS'),
+					new MessageButton()
+					.setCustomId('repeat')
+					.setLabel('Repeat')
+					.setStyle('SUCCESS'),
+					new MessageButton()
+					.setCustomId('skip')
+					.setLabel('Skip')
+					.setStyle('SUCCESS'),
+					new MessageButton()
+					.setCustomId('pause')
+					.setLabel('Pause')
+					.setStyle('SUCCESS'),
+					new MessageButton()
+					.setCustomId('stop')
+					.setLabel('Stop')
+					.setStyle('SUCCESS'),
+			);
+			var message = interaction.channel.send({ embeds: [embed], components: [row] });
 			client.mediaPlayerMessage[gid] = await message;
 			client.mediaPlayerMessage[gid].pin();
 		}

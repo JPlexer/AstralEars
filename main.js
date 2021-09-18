@@ -131,6 +131,7 @@ client.on('messageCreate', function(message) {
   }
 });
 client.on('interactionCreate', async interaction => {
+  if (!interaction.isCommand()) return;
   const gid = interaction.guild.id;
   if(!client.skippingUsers) {
     client.skippingUsers={};
@@ -142,7 +143,6 @@ client.on('interactionCreate', async interaction => {
 
   if(!client.skippingUsers[gid]) {client.skippingUsers[gid] = []};
 
-	if (!interaction.isCommand()) return;
  
 	const command = client.commands.get(interaction.commandName);
 
@@ -155,6 +155,25 @@ client.on('interactionCreate', async interaction => {
 		console.error(error);
 		await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
 	}
+});
+
+client.on('interactionCreate', interaction => {
+	if (!interaction.isButton()) return;
+  if(!client.mediaPlayerMessage) {
+    return
+  }
+  if(!client.mediaPlayerMessage[interaction.guild.id]) {
+    return;
+  }
+  const collector = client.mediaPlayerMessage[interaction.guild.id].createMessageComponentCollector({ componentType: 'BUTTON', time: 15000 });
+
+collector.on('collect', i => {
+		i.reply(`${i.user.id} clicked on the ${i.customId} button.`);
+});
+
+collector.on('end', collected => {
+	console.log(`Collected ${collected.size} interactions.`);
+});
 });
 
 
