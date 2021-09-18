@@ -5,7 +5,8 @@ module.exports = {
 		.setName('resume')
 		.setDescription('Resume the currently playing song'),
 	async execute(interaction, client) {
-		client.manager.players.get(interaction.guild.id).pause(false)
+		client.manager.players.get(interaction.guild.id).pause(false);
+		client.updateEmbedMessage(interaction.guild.id);
 		await interaction.reply('Resumed the currently playing Track!');
 	},
 };
