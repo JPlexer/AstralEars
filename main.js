@@ -1,5 +1,5 @@
 const fs = require('fs');
-const { Client, Collection, MessageEmbed,  MessageActionRow, MessageButton } = require('discord.js');
+const { Client, Collection, MessageEmbed,  MessageActionRow, MessageButton, Permissions } = require('discord.js');
 const { bottoken, lavalinkpassword, configcolor, configname, configversion } = require('./config.json');
 const client = new Client({ intents: ['GUILD_VOICE_STATES', 'GUILD_MESSAGES', 'GUILDS'] });
 const { Manager } = require("erela.js");
@@ -199,10 +199,10 @@ client.on('interactionCreate', async interaction => {
             interaction.reply("<:aewarning:838515499611586561> To skip an item, you'll need to be in the same voice channel.");
             return;
         }
-        /*if (skippingUser.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
+        if (skippingUser.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
 			client.manager.players.get(interaction.guild.id).stop();
             client.skippingUsers[gid] = [];
-        } else {*/
+        } else {
        if (vchannel.members.filter(member => !member.user.bot).size / 2 > client.skippingUsers[gid].length) {
            if(client.skippingUsers[gid].includes(skippingUser.id)) {
                if(Math.ceil((vchannel.members.filter(member => !member.user.bot).size / 2) - client.skippingUsers[gid].length) === 1) {
@@ -233,6 +233,7 @@ client.on('interactionCreate', async interaction => {
         client.skippingUsers[gid] = [];
 		client.manager.players.get(interaction.guild.id).stop();
        }
+      }
    // }
 		await interaction.reply('Skipping...');
     }
@@ -300,7 +301,10 @@ client.on('interactionCreate', async interaction => {
       }
     }
     else if (interaction.customId == "stop") {
-      const player = client.manager.players.get(interaction.guildId);
+		var player = client.manager.players.get(interaction.guild.id)
+		const vchannel = client.channels.cache.get(player.voiceChannel);
+      if (interaction.user.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES) || vchannel.members.filter(member => !member.user.bot).size <= 2) {
+        const player = client.manager.players.get(interaction.guildId);
       client.mediaPlayerMessage[interaction.guild.id].unpin();
       let embed = new MessageEmbed();
       embed.setTitle(configname);
@@ -311,6 +315,10 @@ client.on('interactionCreate', async interaction => {
       client.mediaPlayerMessage[interaction.guild.id] = false;
       interaction.reply("That's all folks! Thanks for using "+ configname+"!");
       player.destroy();
+      } else {
+		interaction.reply(`<:aewarning:838515499611586561> You are not allowed to Stop `);
+          }
+      
     }
   } else {
     return;
