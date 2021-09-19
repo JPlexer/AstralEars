@@ -26,14 +26,7 @@
     "discord-api-types": "^0.22.0",
     "discord.js": "^13.1.0",
     "erela.js": "^2.3.3",
-    "erela.js-apple": "^1.2.2",
     "erela.js-deezer": "^1.0.7",
-    "ffmpeg-static": "^4.4.0",
-    "tweetnacl": "^1.0.3",
-    "youtube-search": "^1.1.6",
-    "ytdl-core": "^4.9.1"
-  },
-  "devDependencies": {
-    "eslint": "^7.32.0"
+    "ffmpeg-static": "^4.4.0"
   }
 }

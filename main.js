@@ -1,10 +1,9 @@
 const fs = require('fs');
-const { Client, Collection, MessageEmbed } = require('discord.js');
+const { Client, Collection, MessageEmbed,  MessageActionRow, MessageButton } = require('discord.js');
 const { bottoken, lavalinkpassword, configcolor, configname, configversion } = require('./config.json');
 const client = new Client({ intents: ['GUILD_VOICE_STATES', 'GUILD_MESSAGES', 'GUILDS'] });
 const { Manager } = require("erela.js");
 const Deezer  = require("erela.js-deezer");
-const AppleMusic  = require("erela.js-apple");
 const Spotify = require("better-erela.js-spotify").default;
 const play = require('./commands/play');
 
@@ -24,7 +23,6 @@ client.manager = new Manager({
   plugins: [
     // Initiate the plugin
     new Deezer(),
-    new AppleMusic(),
     new Spotify()
   ],
   // Method to send voice data to Discord
@@ -127,7 +125,7 @@ client.manager.on("trackStart", (player, track) => {
 client.on("raw", d => client.manager.updateVoiceState(d));
 client.on('messageCreate', function(message) {
   if(message.content.startsWith("ae:")) {
-    message.channel.send(configname + " doesn't use this prefix anymore. Please use the / commands.")
+    message.channel.send(configname + " doesn't use this prefix anymore. Please use the / commands. If they don't work for you, you might have to re-invite AstralEars here: https://jplexer.omg.lol/astralears.")
   }
 });
 client.on('interactionCreate', async interaction => {
@@ -157,7 +155,7 @@ client.on('interactionCreate', async interaction => {
 	}
 });
 
-client.on('interactionCreate', interaction => {
+client.on('interactionCreate', async interaction => {
 	if (!interaction.isButton()) return;
   if(!client.mediaPlayerMessage) {
     return
@@ -165,15 +163,159 @@ client.on('interactionCreate', interaction => {
   if(!client.mediaPlayerMessage[interaction.guild.id]) {
     return;
   }
-  const collector = client.mediaPlayerMessage[interaction.guild.id].createMessageComponentCollector({ componentType: 'BUTTON', time: 15000 });
 
-collector.on('collect', i => {
-		i.reply(`${i.user.id} clicked on the ${i.customId} button.`);
-});
+  if (interaction.message.id == client.mediaPlayerMessage[interaction.guild.id].id) {
+    if (interaction.customId == "queue") {
+      const player = client.manager.players.get(interaction.guildId);
+    	const queue = player.queue;
+		  let embed = new MessageEmbed();
+		  embed.setColor(configcolor);
+		  embed.setTitle("Queue");
+		  embed.addField("#1", queue.current.title + " - " + queue.current.author);
+		  var i = 2;
+		  queue.forEach(element => {
+			  embed.addField("#" + i, element.title + " - " + element.author);
+			  i++;
+		  });
+		  embed.setFooter(configname + " " + configversion + " - " + (player.queue.size + 1) + " items enqueued");
+		  await interaction.reply({ embeds: [embed] });
+    } else if (interaction.customId == "repeat") {
+      if (!client.manager.players.get(interaction.guild.id).trackRepeat) {
+        client.manager.players.get(interaction.guild.id).setTrackRepeat(true);
+        client.updateEmbedMessage(interaction.guild.id);
+        await interaction.reply('Repeating `' + client.manager.players.get(interaction.guild.id).queue.current.title + "`");
+      } else {
+        client.manager.players.get(interaction.guild.id).setTrackRepeat(false);
+        client.updateEmbedMessage(interaction.guild.id);
+        await interaction.reply('Continuing with queue.');
+      }
+    } else if (interaction.customId == "skip") {
+      var skippingUser = interaction.member;
+		var player = client.manager.players.get(interaction.guild.id)
+		const gid = interaction.guild.id;
+		if(!player) {interaction.reply("<:aewarning:838515499611586561> AstralEars needs to be in a Voice Channel."); return;}
+		const vchannel = client.channels.cache.get(player.voiceChannel);
+		if (vchannel != skippingUser.voice.channel) {
+            interaction.reply("<:aewarning:838515499611586561> To skip an item, you'll need to be in the same voice channel.");
+            return;
+        }
+        /*if (skippingUser.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
+			client.manager.players.get(interaction.guild.id).stop();
+            client.skippingUsers[gid] = [];
+        } else {*/
+       if (vchannel.members.filter(member => !member.user.bot).size / 2 > client.skippingUsers[gid].length) {
+           if(client.skippingUsers[gid].includes(skippingUser.id)) {
+               if(Math.ceil((vchannel.members.filter(member => !member.user.bot).size / 2) - client.skippingUsers[gid].length) === 1) {
+                interaction.reply(`<:aewarning:838515499611586561> You already voted to skip. You need ${Math.ceil((vchannel.members.filter(member => !member.user.bot).size / 2) - client.skippingUsers[gid].length)} more person to skip.`);
+                return;
+               } else {
+                interaction.reply(`<:aewarning:838515499611586561> You already voted to skip. You need ${Math.ceil((vchannel.members.filter(member => !member.user.bot).size / 2) - client.skippingUsers[gid].length)} more people to skip.`);
+                return;
+               }
+               
+        } else {
+            client.skippingUsers[gid].push(skippingUser.id)
+            if (vchannel.members.filter(member => !member.user.bot).size / 2 > client.skippingUsers[gid].length) {
+                if(Math.ceil((vchannel.members.filter(member => !member.user.bot).size / 2) - client.skippingUsers[gid].length) === 1) {
+                    interaction.reply(`<:aewarning:838515499611586561> Counted Vote! You need ${Math.ceil((vchannel.members.filter(member => !member.user.bot).size / 2) - client.skippingUsers[gid].length)} more person to skip.`);
+                return;
+                   } else {
+                    interaction.reply(`<:aewarning:838515499611586561> Counted Vote! You need ${Math.ceil((vchannel.members.filter(member => !member.user.bot).size / 2) - client.skippingUsers[gid].length)} more people to skip.`);
+                return;
+                   }
+                
+            } else {
+                client.skippingUsers[gid] = [];
+				client.manager.players.get(interaction.guild.id).stop();
+            }
+        }
+       } else {
+        client.skippingUsers[gid] = [];
+		client.manager.players.get(interaction.guild.id).stop();
+       }
+   // }
+		await interaction.reply('Skipping...');
+    }
+    else if (interaction.customId == "pause") {
+      const player = client.manager.players.get(interaction.guildId);
 
-collector.on('end', collected => {
-	console.log(`Collected ${collected.size} interactions.`);
-});
+      if(!player.paused) {
+        client.manager.players.get(interaction.guild.id).pause(true);
+        client.updateEmbedMessage(interaction.guild.id);
+        const row = new MessageActionRow()
+			.addComponents(
+				new MessageButton()
+					.setCustomId('queue')
+					.setLabel('Queue')
+					.setStyle('SUCCESS'),
+					new MessageButton()
+					.setCustomId('repeat')
+					.setLabel('Repeat')
+					.setStyle('SUCCESS'),
+					new MessageButton()
+					.setCustomId('skip')
+					.setLabel('Skip')
+					.setStyle('SUCCESS'),
+					new MessageButton()
+					.setCustomId('pause')
+					.setLabel('Resume')
+					.setStyle('SUCCESS'),
+					new MessageButton()
+					.setCustomId('stop')
+					.setLabel('Stop')
+					.setStyle('SUCCESS'),
+			);
+        interaction.update({
+          components: [row]
+        })
+      } else {
+        client.manager.players.get(interaction.guild.id).pause(false);
+        client.updateEmbedMessage(interaction.guild.id);
+        const row = new MessageActionRow()
+			.addComponents(
+				new MessageButton()
+					.setCustomId('queue')
+					.setLabel('Queue')
+					.setStyle('SUCCESS'),
+					new MessageButton()
+					.setCustomId('repeat')
+					.setLabel('Repeat')
+					.setStyle('SUCCESS'),
+					new MessageButton()
+					.setCustomId('skip')
+					.setLabel('Skip')
+					.setStyle('SUCCESS'),
+					new MessageButton()
+					.setCustomId('pause')
+					.setLabel('Pause')
+					.setStyle('SUCCESS'),
+					new MessageButton()
+					.setCustomId('stop')
+					.setLabel('Stop')
+					.setStyle('SUCCESS'),
+			);
+        interaction.update({
+          components: [row]
+        })
+      }
+    }
+    else if (interaction.customId == "stop") {
+      const player = client.manager.players.get(interaction.guildId);
+      client.mediaPlayerMessage[interaction.guild.id].unpin();
+      let embed = new MessageEmbed();
+      embed.setTitle(configname);
+      embed.setColor(configcolor);
+      embed.setDescription("That's all folks! Thanks for using "+ configname+"!");
+        
+      client.mediaPlayerMessage[interaction.guild.id].edit({ embeds: [embed] });
+      client.mediaPlayerMessage[interaction.guild.id] = false;
+      interaction.reply("That's all folks! Thanks for using "+ configname+"!");
+      player.destroy();
+    }
+  } else {
+    return;
+  }
+  
 });
 
 
