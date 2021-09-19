@@ -59,7 +59,7 @@ for (const file of commandFiles) {
 client.once('ready', c => {
   client.manager.init(client.user.id);
 	console.log(`Ready! Logged in as ${c.user.tag}`);
-  client.user.setActivity("to your Wishes", {
+  client.user.setActivity("your Wishes", {
     type: "LISTENING"
   });
 });
