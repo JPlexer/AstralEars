@@ -14,10 +14,10 @@ module.exports = {
             interaction.reply("<:aewarning:838515499611586561> To skip an item, you'll need to be in the same voice channel.");
             return;
         }
-        /*if (skippingUser.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
+        if (skippingUser.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
 			client.manager.players.get(interaction.guild.id).stop();
             client.skippingUsers[gid] = [];
-        } else {*/
+        } else {
        if (vchannel.members.filter(member => !member.user.bot).size / 2 > client.skippingUsers[gid].length) {
            if(client.skippingUsers[gid].includes(skippingUser.id)) {
                if(Math.ceil((vchannel.members.filter(member => !member.user.bot).size / 2) - client.skippingUsers[gid].length) === 1) {
@@ -50,5 +50,6 @@ module.exports = {
        }
    // }
 		await interaction.reply('Skipping...');
+        }
 	},
 };
