@@ -155,7 +155,7 @@ client.on('interactionCreate', async interaction => {
 	}
 });
 
-client.on('interactionCreate', async interaction => {
+/*client.on('interactionCreate', async interaction => {
 	if (!interaction.isButton()) return;
   if(!client.mediaPlayerMessage) {
     return
@@ -324,7 +324,7 @@ client.on('interactionCreate', async interaction => {
     return;
   }
   
-});
+});*/
 
 
 client.login(bottoken);

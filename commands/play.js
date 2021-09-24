@@ -41,7 +41,7 @@ module.exports = {
 			embed.setTitle(configname);
 			embed.setColor(configcolor);
 			embed.setDescription("Welcome to "+ configname +"! Initializing media player...");
-			const row = new MessageActionRow()
+			/*const row = new MessageActionRow()
 			.addComponents(
 				new MessageButton()
 					.setCustomId('queue')
@@ -63,8 +63,8 @@ module.exports = {
 					.setCustomId('stop')
 					.setLabel('Stop')
 					.setStyle('SUCCESS'),
-			);
-			var message = interaction.channel.send({ embeds: [embed], components: [row] });
+			);*/
+			var message = interaction.channel.send({ embeds: [embed]/*, components: [row]*/ });
 			client.mediaPlayerMessage[gid] = await message;
 			client.mediaPlayerMessage[gid].pin();
 		}
