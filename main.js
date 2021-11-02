@@ -2,11 +2,12 @@ const fs = require('fs');
 const { Client, Collection, MessageEmbed,  MessageActionRow, MessageButton, Permissions } = require('discord.js');
 const { bottoken, lavalinkpassword, configcolor, configname, configversion } = require('./config.json');
 const client = new Client({ intents: ['GUILD_VOICE_STATES', 'GUILD_MESSAGES', 'GUILDS'] });
+const { DiscordTogether } = require('discord-together');
 const { Manager } = require("erela.js");
 const Deezer  = require("erela.js-deezer");
 const Spotify = require("better-erela.js-spotify").default;
 const play = require('./commands/play');
-
+client.discordTogether = new DiscordTogether(client);
 // Define some options for the node
 const nodes = [
   {
